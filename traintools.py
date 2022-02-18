@@ -129,7 +129,7 @@ class VisualizeSchedule:
         """Show the space-time plot of the train schedule.
         """
 
-        fig, ax = plt.subplots(figsize=(20, 10))
+        fig, ax = plt.subplots(figsize=(30, 10))
         ax.set_xlim(300, 1500)
 
         for key, value in self.trains.items():
