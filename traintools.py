@@ -19,6 +19,18 @@ def to_minutes_past_midnight(time: int) -> int:
     return 60 * hours + minutes
 
 
+def to_regular_time(time: int) -> int:
+    """Converts the time in minutes past midnight back to the regular time format.
+    """
+
+    assert type(time) == int, "The time must be an integer!"
+
+    hours = time // 60
+    minutes = time % 60
+
+    return hours * 100 + minutes
+
+
 def minimum_number_of_trains(row:pd.Series, train_type: Tuple[int, int])->  int:
     """Finds the minimum number of trains needed in row.
     """
