@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import itertools
+from collections import defaultdict
 from trainconstants import *
 
 
@@ -66,13 +67,10 @@ def create_trains_dict(schedulce: pd.DataFrame) -> dict:
     with the train_number as key and that trains schedule as value.
     """
 
-    trains = dict()
+    trains = defaultdict(pd.DataFrame)
 
     for index, row in schedulce.iterrows():
-        if row[0] in trains:
-            trains[row[0]] = pd.concat([trains[row[0]], pd.DataFrame(row).T])
-        else:
-            trains[row[0]] = pd.DataFrame(row).T
+        trains[row[0]] = pd.concat([trains[row[0]], pd.DataFrame(row).T])
     
     return trains
 
