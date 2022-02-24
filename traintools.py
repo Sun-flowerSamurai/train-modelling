@@ -88,7 +88,7 @@ class Train:
         self._schedule = schedule
         df = pd.DataFrame()
         df['time'] = pd.concat([schedule['departure_time'], schedule['arrival_time']])
-        df['place'] = pd.concat([schedule['from'], schedule['to']])
+        df['place'] = pd.concat([schedule['start'], schedule['end']])
         self.schedule = df.sort_values(by='time').reset_index()
 
 
@@ -104,7 +104,7 @@ class Train:
         for index, row in self._schedule.iterrows():
             offset_t = 10
             offset_p = 0
-            place = row['from'] - (row['from'] - row['to'])/4 + offset_p
+            place = row['start'] - (row['start'] - row['end'])/4 + offset_p
             time = row['departure_time'] - (row['departure_time'] - row['arrival_time'])/4 + offset_t
 
             ax.text(time, place, f'{row[5]}\n{row[6]}')

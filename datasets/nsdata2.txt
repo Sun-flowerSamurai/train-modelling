@@ -1,4 +1,4 @@
-train_number from to departure_time arrival_time first_class second_class
+train_number start end departure_time arrival_time first_class second_class
 2123 2 3 700 740 3 34
 2123 3 4 743 838 11 196
 2127 1 2 648 755 38 204
