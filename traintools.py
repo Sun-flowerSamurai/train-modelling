@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, List
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
