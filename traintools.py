@@ -8,6 +8,17 @@ from collections import defaultdict
 from trainconstants import *
 
 
+def read_schedule(filename: str) -> pd.DataFrame:
+    """Read a schedule from a file.
+    """
+
+    df = pd.read_csv(filename,  delimiter=r"\s+")
+    df['departure_time'] = df['departure_time'].map(to_minutes_past_midnight)
+    df['arrival_time'] = df['arrival_time'].map(to_minutes_past_midnight)
+
+    return df
+
+
 def to_minutes_past_midnight(time: int) -> int:
     """Converts the time as used in the data-files to minutes past midnight.
     """
