@@ -89,6 +89,7 @@ def create_trains_dict(schedulce: pd.DataFrame) -> dict:
 colors = ['b', 'r', 'k', 'g', 'm', 'c']
 color_cycle = itertools.cycle(colors)
 
+
 class Train:
     def __init__(self, train_number: int, schedule: pd.DataFrame, ax:plt.Axes) -> None:
         """Create train object based on the train number and its schedule.
