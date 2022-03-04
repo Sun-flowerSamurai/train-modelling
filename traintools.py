@@ -154,6 +154,10 @@ class VisualizeSchedule:
         fig, ax = plt.subplots(figsize=(30, 10))
         ax.set_xlim(300, 1500)
 
+        ax.axes.yaxis.set_visible(False)
+        ax.set_xlabel('Minutes past midnight')
+        ax.grid(True)
+
         for key, value in self.trains.items():
             train = Train(key, value, ax)
             train.plot()
