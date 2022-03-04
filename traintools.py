@@ -152,9 +152,9 @@ class VisualizeSchedule:
         """
 
         fig, ax = plt.subplots(figsize=(30, 10))
-        ax.set_xlim(300, 1500)
-        ax.set_xlabel('Minutes past midnight')
-        ax.yaxis.grid()
+
+        for station in range(1, 5):
+            plt.plot([300, 1450], [station, station], color='k')
 
         for key, value in self.trains.items():
             train = Train(key, value, ax)
@@ -163,4 +163,11 @@ class VisualizeSchedule:
             ax.text(300, ROTTERDAM + 0.1, 'Rotterdam')
             ax.text(300, ROOSENDAAL + 0.1, 'Roosendaal')
             ax.text(300, VLISSINGEN + 0.1, 'Vlissingen')
-            plt.legend().remove()
+
+        ax.set_xlim(300, 1450)
+        ax.set_xlabel('Minutes past midnight')
+        ax.get_yaxis().set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['top'].set_visible(False)
+        ax.spines['left'].set_visible(False)
+        plt.legend().remove()
