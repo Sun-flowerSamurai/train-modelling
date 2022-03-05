@@ -177,7 +177,7 @@ class VisualizeSchedule:
         plt.legend().remove()
 
 
-def find_staring_trainstops(G: nx.DiGraph) -> Tuple[TrainStop]:
+def find_starting_trainstops(G: nx.DiGraph) -> Tuple[TrainStop]:
     """Creates a tuple of the first trainstop per station.
     """
 
@@ -188,7 +188,7 @@ def find_ending_trainstops(G: nx.DiGraph) -> Tuple[TrainStop]:
     """Creates a tuple of the last trainstop per station.
     """
 
-    return [stops[-1] for stops in find_all_stops_per_station(G).values()]
+    return (stops[-1] for stops in find_all_stops_per_station(G).values())
 
 
 def create_network_schedule(df: pd.DataFrame) -> pd.DataFrame:
