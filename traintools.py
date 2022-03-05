@@ -1,11 +1,13 @@
 from typing import Tuple, List
 import pandas as pd
 import numpy as np
+import networkx as nx
 import matplotlib.pyplot as plt
 import math
 import itertools
 from collections import defaultdict
 from trainconstants import *
+TrainStop = Tuple[int, int]
 
 
 def read_schedule(filename: str) -> pd.DataFrame:
@@ -171,3 +173,88 @@ class VisualizeSchedule:
         ax.spines['top'].set_visible(False)
         ax.spines['left'].set_visible(False)
         plt.legend().remove()
+
+
+def find_staring_trainstops(G: nx.DiGraph) -> Tuple[TrainStop]:
+    """Creates a tuple of the first trainstop per station.
+    """
+
+    return (stops[0] for station, stops in find_all_stops_per_station(G).items())
+
+
+def find_ending_trainstops(G: nx.DiGraph) -> Tuple[TrainStop]:
+    """Creates a tuple of the last trainstop per station.
+    """
+
+    return [stops[-1] for station, stops in find_all_stops_per_station(G).items()]
+
+
+def create_network_schedule(df: pd.DataFrame) -> pd.DataFrame:
+    """Creates a DataFrame which can be turned into a networkx graph.
+
+    The DataFrame consists of 4 columns, with for each train ride a separate row.
+    The columns are
+    first_class: minimum number of seats for first class passengers 
+    second_class: minimum number of seats for second class passengers
+    start: Tuple[station, departure time]
+    end: Tuple[station, arrival time]
+    """
+
+    network_schedule = df[['first_class', 'second_class']].copy()
+    network_schedule['start'] = list(zip(df.start, df.departure_time))
+    network_schedule['end'] = list(zip(df.end, df.arrival_time))
+
+    return network_schedule
+
+
+def find_all_stops_per_station(G: nx.DiGraph) -> List[TrainStop]:
+    """Creats dict with each station as a key and all stops to / from that station in a list as the value.
+    The stops appear in chronological order in the list.
+    """
+
+    nodes_per_station = defaultdict(list)
+
+    # create dict with each station as a key and all stops to / from that station in a list as the value 
+    for node in G.nodes:
+        nodes_per_station[node[0]].append(node)
+
+    for station in nodes_per_station.keys():
+        # sort the stations so they appear in chronological order in the list
+        nodes_per_station[station].sort()
+
+    return nodes_per_station
+
+
+def connect_stationary_nodes(G: nx.DiGraph) -> None:
+    """Connects all nodes to the next node in time at the same station.
+    Corresponds to the train staying at the same station, i.e. not being used.
+    """
+
+    nodes_per_station = find_all_stops_per_station(G)
+    
+    for station in nodes_per_station.keys():
+        # connect each stop to the next stop in time at the same station
+        for index, stop in enumerate(nodes_per_station[station][:-1]):
+            G.add_edge(stop, nodes_per_station[station][index + 1], first_class=0, second_class=0)
+
+
+def graph_from_schedule(df: pd.DataFrame) -> nx.DiGraph:
+    """Creates a digraph from the schedule.
+    """
+    
+    # create the dataframe in the needed format for the creation of a graph
+    schedule_network = create_network_schedule(df)
+
+    # create the graph
+    G = nx.from_pandas_edgelist(
+        df=schedule_network, 
+        source='start', 
+        target='end', 
+        edge_attr=['first_class', 'second_class'], 
+        create_using=nx.DiGraph
+        )
+    
+    # add the stationary connections that correspond to staying at any given station
+    connect_stationary_nodes(G)
+
+    return G
