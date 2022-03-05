@@ -7,6 +7,8 @@ import math
 import itertools
 from collections import defaultdict
 from trainconstants import *
+
+
 TrainStop = Tuple[int, int]
 
 
@@ -107,7 +109,7 @@ class Train:
 
 
     def plot(self) -> None:
-        """Plot the space time graph of the train line
+        """Plot the space time graph of the train line.
         """
         col = next(color_cycle)
 
@@ -156,7 +158,7 @@ class VisualizeSchedule:
         fig, ax = plt.subplots(figsize=(30, 10))
 
         for station in range(1, 5):
-            plt.plot([300, 1450], [station, station], color='k')
+            plt.plot([300, 1440], [station, station], color='k')
 
         for key, value in self.trains.items():
             train = Train(key, value, ax)
@@ -179,14 +181,14 @@ def find_staring_trainstops(G: nx.DiGraph) -> Tuple[TrainStop]:
     """Creates a tuple of the first trainstop per station.
     """
 
-    return (stops[0] for station, stops in find_all_stops_per_station(G).items())
+    return (stops[0] for stops in find_all_stops_per_station(G).values())
 
 
 def find_ending_trainstops(G: nx.DiGraph) -> Tuple[TrainStop]:
     """Creates a tuple of the last trainstop per station.
     """
 
-    return [stops[-1] for station, stops in find_all_stops_per_station(G).items()]
+    return [stops[-1] for stops in find_all_stops_per_station(G).values()]
 
 
 def create_network_schedule(df: pd.DataFrame) -> pd.DataFrame:
