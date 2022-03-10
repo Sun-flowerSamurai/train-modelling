@@ -1,12 +1,20 @@
 from typing import Tuple, List
+from matplotlib import style
 import pandas as pd
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import math
-import itertools
 from collections import defaultdict
 from trainconstants import *
+
+from cycler import cycler
+line_cycler = (cycler(color=["#E69F00", "#56B4E9", "#009E73", "#0072B2", "#D55E00", "#CC79A7", "#F0E442"]) + 
+            cycler(linestyle=["-", "--", "-.", ":", "-", "--", "-."]))
+
+plt.rc("axes", prop_cycle=line_cycler)
+
+
 
 
 TrainStop = Tuple[int, int]
@@ -90,10 +98,6 @@ def create_trains_dict(schedulce: pd.DataFrame) -> dict:
     return trains
 
 
-colors = ['b', 'r', 'k', 'g', 'm', 'c']
-color_cycle = itertools.cycle(colors)
-
-
 class Train:
     def __init__(self, train_number: int, schedule: pd.DataFrame, ax:plt.Axes) -> None:
         """Create train object based on the train number and its schedule.
@@ -111,11 +115,10 @@ class Train:
     def plot(self) -> None:
         """Plot the space time graph of the train line.
         """
-        col = next(color_cycle)
-
+        
         ax=self.ax
             
-        self.schedule.plot(kind='line', x='time', y='place', ax=ax, color=col) 
+        self.schedule.plot(kind='line', x='time', y='place', ax=ax) 
          
         for index, row in self._schedule.iterrows():
             offset_t = 10
@@ -158,7 +161,7 @@ class VisualizeSchedule:
         fig, ax = plt.subplots(figsize=(30, 10))
 
         for station in range(1, 5):
-            plt.plot([300, 1440], [station, station], color='k')
+            plt.plot([300, 1440], [station, station], color='k', linestyle="-")
 
         for key, value in self.trains.items():
             train = Train(key, value, ax)
