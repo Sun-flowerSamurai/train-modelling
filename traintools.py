@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
+import matplotlib
 import math
 import operator
 from collections import defaultdict
@@ -14,9 +15,15 @@ colors = ['#2E75B6', '#763870', '#C8191A', '#101073', '#6A7A94', '#66968C', '#38
 line_cycler   = (cycler(color=colors) +
                  cycler(linestyle=['-', '--', '-.', ':', '-', '--', '-.']))
 
-plt.rc("axes", prop_cycle=line_cycler)
-
-
+matplotlib.rcParams.update({'font.size': 20,
+            'legend.fontsize': 20,
+            'axes.titlesize': 25,
+            'axes.labelsize': 25,
+            'axes.titleweight': 'bold',
+            'lines.linewidth': 3,
+            'xtick.labelsize': 20,
+            'ytick.labelsize': 20,
+            'axes.prop_cycle': line_cycler})
 
 
 TrainStop = Tuple[int, int]
@@ -169,10 +176,10 @@ class VisualizeSchedule:
         for key, value in self.trains.items():
             train = Train(key, value, ax)
             train.plot()
-            ax.text(300, AMSTERDAM + 0.1, 'Amsterdam')
-            ax.text(300, ROTTERDAM + 0.1, 'Rotterdam')
-            ax.text(300, ROOSENDAAL + 0.1, 'Roosendaal')
-            ax.text(300, VLISSINGEN + 0.1, 'Vlissingen')
+            ax.text(300, AMSTERDAM + 0.1, 'Amsterdam', fontsize=15)
+            ax.text(300, ROTTERDAM + 0.1, 'Rotterdam', fontsize=15)
+            ax.text(300, ROOSENDAAL + 0.1, 'Roosendaal', fontsize=15)
+            ax.text(300, VLISSINGEN + 0.1, 'Vlissingen', fontsize=15)
 
         ax.set_xlim(300, 1450)
         ax.set_xlabel('Minutes past midnight')
