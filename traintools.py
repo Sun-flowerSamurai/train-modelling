@@ -9,8 +9,9 @@ from collections import defaultdict
 from trainconstants import *
 
 from cycler import cycler
-line_cycler = (cycler(color=["#E69F00", "#56B4E9", "#009E73", "#0072B2", "#D55E00", "#CC79A7", "#F0E442"]) + 
-            cycler(linestyle=["-", "--", "-.", ":", "-", "--", "-."]))
+colors = ['#2E75B6', '#763870', '#C8191A', '#101073', '#6A7A94', '#66968C', '#385765']
+line_cycler   = (cycler(color=colors) +
+                 cycler(linestyle=['-', '--', '-.', ':', '-', '--', '-.']))
 
 plt.rc("axes", prop_cycle=line_cycler)
 
