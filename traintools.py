@@ -181,7 +181,8 @@ class VisualizeSchedule:
             ax.text(300, ROOSENDAAL + 0.1, 'Roosendaal', fontsize=15)
             ax.text(300, VLISSINGEN + 0.1, 'Vlissingen', fontsize=15)
 
-        ax.set_xlim(300, 1450)
+        ax.set_xlim(250, 1450)
+        ax.set_ylim(0.5, 4.5)
         ax.set_xlabel('Minutes past midnight')
         ax.get_yaxis().set_visible(False)
         ax.spines['right'].set_visible(False)
