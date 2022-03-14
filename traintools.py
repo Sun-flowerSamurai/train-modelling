@@ -5,6 +5,7 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 import math
+import operator
 from collections import defaultdict
 from trainconstants import *
 
@@ -19,6 +20,7 @@ plt.rc("axes", prop_cycle=line_cycler)
 
 
 TrainStop = Tuple[int, int]
+TrainType = Tuple[int, int]
 
 
 def read_schedule(filename: str) -> pd.DataFrame:
@@ -195,7 +197,7 @@ def find_ending_trainstops(G: nx.DiGraph) -> Tuple[TrainStop]:
     return (stops[-1] for stops in find_all_stops_per_station(G).values())
 
 
-def create_network_schedule(df: pd.DataFrame) -> pd.DataFrame:
+def create_network_schedule(df: pd.DataFrame, train_type: Tuple[int, int]) -> pd.DataFrame:
     """Creates a DataFrame which can be turned into a networkx graph.
 
     The DataFrame consists of 4 columns, with for each train ride a separate row.
@@ -205,10 +207,18 @@ def create_network_schedule(df: pd.DataFrame) -> pd.DataFrame:
     start: Tuple[station, departure time]
     end: Tuple[station, arrival time]
     """
-
+    def find_bottleneck(row: pd.Series):
+        """Find the bottleneck which will decide what the minimum number of trains are.
+        """
+        return math.ceil(max(row[0], row[1]))
+    
     network_schedule = df[['first_class', 'second_class']].copy()
     network_schedule['start'] = list(zip(df.start, df.departure_time))
     network_schedule['end'] = list(zip(df.end, df.arrival_time))
+    temp = network_schedule[['first_class', 'second_class']].copy()
+    temp['trains_first'] = temp[['first_class']].apply(operator.truediv, args=(train_type[0],))
+    temp['trains_second'] = temp[['second_class']].apply(operator.truediv, args=(train_type[1],))
+    network_schedule['min_trains'] = temp[['trains_first', 'trains_second']].apply(find_bottleneck, axis=1)
 
     return network_schedule
 
@@ -241,22 +251,22 @@ def connect_stationary_nodes(G: nx.DiGraph) -> None:
     for station in nodes_per_station.keys():
         # connect each stop to the next stop in time at the same station
         for index, stop in enumerate(nodes_per_station[station][:-1]):
-            G.add_edge(stop, nodes_per_station[station][index + 1], first_class=0, second_class=0)
+            G.add_edge(stop, nodes_per_station[station][index + 1], min_trains=0)
 
 
-def graph_from_schedule(df: pd.DataFrame) -> nx.DiGraph:
+def graph_from_schedule(df: pd.DataFrame, train_type: TrainType) -> nx.DiGraph:
     """Creates a digraph from the schedule.
     """
     
     # create the dataframe in the needed format for the creation of a graph
-    schedule_network = create_network_schedule(df)
+    schedule_network = create_network_schedule(df, train_type)
 
     # create the graph
     G = nx.from_pandas_edgelist(
         df=schedule_network, 
         source='start', 
         target='end', 
-        edge_attr=['first_class', 'second_class'], 
+        edge_attr=['min_trains'], 
         create_using=nx.DiGraph
         )
     
