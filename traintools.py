@@ -11,17 +11,21 @@ from collections import defaultdict
 from trainconstants import *
 
 from cycler import cycler
-colors = ['#2E75B6', '#763870', '#C8191A', '#101073', '#6A7A94', '#66968C', '#385765']
+colors = ['#004280', '#7da1c5', '#20efb7', '#278790', '#1a2438']
 line_cycler   = (cycler(color=colors) +
-                 cycler(linestyle=['-', '--', '-.', ':', '-', '--', '-.']))
+                 cycler(linestyle=['-', '--', '-.', ':', '-']))
 
 matplotlib.rcParams.update({'font.size': 20,
+            'text.usetex': True,
+            'font.family': 'sans-serif',
+            'font.sans-serif': ['Helvetica'],
             'legend.fontsize': 20,
             'axes.titlesize': 25,
             'axes.labelsize': 25,
             'axes.titleweight': 'bold',
             'lines.linewidth': 3,
             'xtick.labelsize': 20,
+            'text.latex.preamble': r'\usepackage[cm]{sfmath}',
             'ytick.labelsize': 20,
             'axes.prop_cycle': line_cycler})
 
@@ -169,6 +173,9 @@ class VisualizeSchedule:
         """
 
         fig, ax = plt.subplots(figsize=(30, 10))
+        fmt = matplotlib.ticker.StrMethodFormatter("{x}")
+        ax.xaxis.set_major_formatter(fmt)
+        ax.yaxis.set_major_formatter(fmt)
 
         for station in range(1, 5):
             plt.plot([300, 1440], [station, station], color='k', linestyle="-")
@@ -176,10 +183,11 @@ class VisualizeSchedule:
         for key, value in self.trains.items():
             train = Train(key, value, ax)
             train.plot()
-            ax.text(300, AMSTERDAM + 0.1, 'Amsterdam', fontsize=15)
-            ax.text(300, ROTTERDAM + 0.1, 'Rotterdam', fontsize=15)
-            ax.text(300, ROOSENDAAL + 0.1, 'Roosendaal', fontsize=15)
-            ax.text(300, VLISSINGEN + 0.1, 'Vlissingen', fontsize=15)
+
+        ax.text(300, AMSTERDAM + 0.1, 'Amsterdam', fontsize=15)
+        ax.text(300, ROTTERDAM + 0.1, 'Rotterdam', fontsize=15)
+        ax.text(300, ROOSENDAAL + 0.1, 'Roosendaal', fontsize=15)
+        ax.text(300, VLISSINGEN + 0.1, 'Vlissingen', fontsize=15)
 
         ax.set_xlim(250, 1450)
         ax.set_ylim(0.5, 4.5)
@@ -227,6 +235,8 @@ def create_network_schedule(df: pd.DataFrame, train_type: Tuple[int, int]) -> pd
     temp['trains_first'] = temp[['first_class']].apply(operator.truediv, args=(train_type[0],))
     temp['trains_second'] = temp[['second_class']].apply(operator.truediv, args=(train_type[1],))
     network_schedule['min_trains'] = temp[['trains_first', 'trains_second']].apply(find_bottleneck, axis=1)
+    network_schedule['trains_needed'] = network_schedule['min_trains'].copy()
+    network_schedule['trains_scheduled'] = 0
 
     return network_schedule
 
@@ -259,7 +269,7 @@ def connect_stationary_nodes(G: nx.DiGraph) -> None:
     for station in nodes_per_station.keys():
         # connect each stop to the next stop in time at the same station
         for index, stop in enumerate(nodes_per_station[station][:-1]):
-            G.add_edge(stop, nodes_per_station[station][index + 1], min_trains=0)
+            G.add_edge(stop, nodes_per_station[station][index + 1], min_trains=0, trains_needed=0, trains_scheduled=0)
 
 
 def graph_from_schedule(df: pd.DataFrame, train_type: TrainType) -> nx.DiGraph:
@@ -274,7 +284,7 @@ def graph_from_schedule(df: pd.DataFrame, train_type: TrainType) -> nx.DiGraph:
         df=schedule_network, 
         source='start', 
         target='end', 
-        edge_attr=['min_trains'], 
+        edge_attr=['min_trains', 'trains_needed', 'trains_scheduled'], 
         create_using=nx.DiGraph
         )
     
