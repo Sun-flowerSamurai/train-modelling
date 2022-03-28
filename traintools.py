@@ -11,21 +11,19 @@ from collections import defaultdict
 from trainconstants import *
 
 from cycler import cycler
-colors = ['#004280', '#7da1c5', '#20efb7', '#278790', '#1a2438']
+colors = ['#2E75B6', '#763870', '#C8191A', '#101073', '#6A7A94', '#66968C', '#385765']
 line_cycler   = (cycler(color=colors) +
-                 cycler(linestyle=['-', '--', '-.', ':', '-']))
-
+                 cycler(linestyle=['-', '--', '-.', ':', '-', '--', '-.']))
+                 
+fmt = matplotlib.ticker.StrMethodFormatter("{x}")
 matplotlib.rcParams.update({'font.size': 20,
             'text.usetex': True,
-            'font.family': 'sans-serif',
-            'font.sans-serif': ['Helvetica'],
             'legend.fontsize': 20,
             'axes.titlesize': 25,
             'axes.labelsize': 25,
             'axes.titleweight': 'bold',
             'lines.linewidth': 3,
             'xtick.labelsize': 20,
-            'text.latex.preamble': r'\usepackage[cm]{sfmath}',
             'ytick.labelsize': 20,
             'axes.prop_cycle': line_cycler})
 
