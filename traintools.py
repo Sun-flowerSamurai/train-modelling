@@ -14,10 +14,8 @@ from cycler import cycler
 colors = ['#2E75B6', '#763870', '#C8191A', '#101073', '#6A7A94', '#66968C', '#385765']
 line_cycler   = (cycler(color=colors) +
                  cycler(linestyle=['-', '--', '-.', ':', '-', '--', '-.']))
-                 
-fmt = matplotlib.ticker.StrMethodFormatter("{x}")
+
 matplotlib.rcParams.update({'font.size': 20,
-            'text.usetex': True,
             'legend.fontsize': 20,
             'axes.titlesize': 25,
             'axes.labelsize': 25,
@@ -171,9 +169,6 @@ class VisualizeSchedule:
         """
 
         fig, ax = plt.subplots(figsize=(30, 10))
-        fmt = matplotlib.ticker.StrMethodFormatter("{x}")
-        ax.xaxis.set_major_formatter(fmt)
-        ax.yaxis.set_major_formatter(fmt)
 
         for station in range(1, 5):
             plt.plot([300, 1440], [station, station], color='k', linestyle="-")
@@ -187,6 +182,7 @@ class VisualizeSchedule:
         ax.text(300, ROOSENDAAL + 0.1, 'Roosendaal', fontsize=15)
         ax.text(300, VLISSINGEN + 0.1, 'Vlissingen', fontsize=15)
 
+        ax.set_xticks(range(300, 1500, 100))
         ax.set_xlim(250, 1450)
         ax.set_ylim(0.5, 4.5)
         ax.set_xlabel('Minutes past midnight')
@@ -201,14 +197,14 @@ def find_starting_trainstops(G: nx.DiGraph) -> Tuple[TrainStop]:
     """Creates a tuple of the first trainstop per station.
     """
 
-    return (stops[0] for stops in find_all_stops_per_station(G).values())
+    return tuple(stops[0] for stops in find_all_stops_per_station(G).values())
 
 
 def find_ending_trainstops(G: nx.DiGraph) -> Tuple[TrainStop]:
     """Creates a tuple of the last trainstop per station.
     """
 
-    return (stops[-1] for stops in find_all_stops_per_station(G).values())
+    return tuple(stops[-1] for stops in find_all_stops_per_station(G).values())
 
 
 def create_network_schedule(df: pd.DataFrame, train_type: Tuple[int, int]) -> pd.DataFrame:
