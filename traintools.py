@@ -518,8 +518,8 @@ def highlight_paths(paths: List[List[TrainStop]], G: nx.DiGraph):
     y, x = zip(*stops_at_edges)
     plt.scatter(x, y, marker='d', s=50, c='r')
 
-    ax.xaxis.set_ticklabels(range(300, 1500, 100))
     ax.set_xticks(range(300, 1500, 100))
+    ax.xaxis.set_ticklabels(range(300, 1500, 100))
     ax.set_xlim(250, 1450)
     ax.set_ylim(0.5, 4.5)
     ax.set_xlabel('Minutes past midnight')
