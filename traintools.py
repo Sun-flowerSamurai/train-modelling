@@ -2,6 +2,7 @@ from typing import Tuple, List
 from matplotlib import style
 import pandas as pd
 import numpy as np
+from pygments import highlight
 import networkx as nx
 import matplotlib.pyplot as plt
 import matplotlib
@@ -26,6 +27,7 @@ matplotlib.rcParams.update({'font.size': 20,
             'xtick.labelsize': 20,
             'ytick.labelsize': 20,
             'axes.prop_cycle': line_cycler})
+
 
 
 TrainStop = Tuple[int, int]
@@ -480,21 +482,52 @@ def find_over_scheduled(G: nx.DiGraph) -> Tuple[int, defaultdict, defaultdict]:
         )
 
 
-def highlight_paths(paths: List[List[TrainStop]], G: nx.DiGraph):
+def highlight_paths(paths: List[List[TrainStop]], G: nx.DiGraph, color_code: bool = False, compare: bool = False):
     """
     """
     train_trips = nx.to_pandas_edgelist(G)
 
 
-    fig, ax = plt.subplots(figsize=(30, 10))
+    if compare:
+        fs = (30, 15)
+    else:
+        fs= (30, 10)
+    fig, ax = plt.subplots(figsize=fs)
 
     for station in range(1, 5):
-        plt.plot([300, 1440], [station, station], color='gray', alpha=0.4, linestyle="-", linewidth=5)
+        pass
+        # plt.plot([300, 1440], [station, station], color='gray', alpha=0.4, linestyle="-", linewidth=5)
 
     for index, row in train_trips.iterrows():
         time = (row['source'][1], row['target'][1])
         stations = (row['source'][0], row['target'][0])
-        plt.plot(time, stations, color='gray', linestyle='-', linewidth=2)
+        highlight_colors = [
+            colors[2], 
+            'gray',
+            'k', 
+            'k', 
+            'k', 
+            'k', 
+            'k', 
+            'k', 
+            'k', 
+            'k', 
+            'k', 
+            'k'
+            ]
+        if color_code:
+            c = highlight_colors[row['over_scheduled']-1]
+        else:
+            c = 'gray'
+        plt.plot(time, stations, color=c, linestyle='-', linewidth=4)
+
+        up = row["source"][0] < row['target'][0]
+        down = 0.2
+        place = row['source'][0] - (row['source'][0] - row['target'][0]) / 3 - down*up
+        time = row['source'][1] - (row['source'][1] - row['target'][1]) / 3
+       
+        if row['source'][0] != row['target'][0] and compare:
+            ax.text(time, place, f'{row["trains_needed"]}\n{row["trains_scheduled"]}', fontsize=20, fontweight='bold', backgroundcolor='#e5ecf3')
     
     colorcycle = itertools.cycle(colors)
 
@@ -516,7 +549,7 @@ def highlight_paths(paths: List[List[TrainStop]], G: nx.DiGraph):
     stops_at_edges = tuple(itertools.chain(find_ending_trainstops(G), find_starting_trainstops(G)))
 
     y, x = zip(*stops_at_edges)
-    plt.scatter(x, y, marker='d', s=50, c='r')
+    plt.scatter(x, y, marker='.', s=200, c='r')
 
     ax.xaxis.set_ticklabels(range(300, 1500, 100))
     ax.set_xticks(range(300, 1500, 100))
